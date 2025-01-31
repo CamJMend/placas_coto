@@ -2,7 +2,7 @@ from ultralytics import YOLO
 import cv2
 
 def load_yolo():
-    model = YOLO("yolov5m.pt")
+    model = YOLO("yolov5/runs/detect/train/weights/best.pt")
     return model
 
 def detect_plates(frame, model):
