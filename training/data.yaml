@@ -1,6 +1,7 @@
-train: ../train/images
-val: ../valid/images
-test: ../test/images
+path: ../training  # Carpeta base del dataset
+train: train/images
+val: valid/images
+test: test/images  # Opcional
 
-nc: 1
+nc: 1  # Número de clases
 names: ['pl_license_plate']
