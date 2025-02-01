@@ -2,17 +2,19 @@ import cv2
 import time
 from detect import load_yolo, detect_plates
 from ocr import extract_text
-from database import save_plate
+from database import check_plate, register_visit
+#from whatsapp import send_whatsapp_message
 
 def main():
-    net = load_yolo()  # Cargar modelo YOLO
-    cap = cv2.VideoCapture(0)  # Capturar video
+    net = load_yolo()
+    cap = cv2.VideoCapture(0)
 
     if not cap.isOpened():
         print("Error al abrir la cámara.")
         return
 
-    last_processed_time = time.time()  # Tiempo de la última imagen procesada
+    last_processed_time = time.time()
+    detected_plates = []
 
     while True:
         ret, frame = cap.read()
@@ -21,21 +23,27 @@ def main():
 
         current_time = time.time()
 
-        # Procesar cada 10 segundos
         if current_time - last_processed_time >= 10:
             plate_roi = detect_plates(frame, net)
             if plate_roi is not None:
                 plate_text = extract_text(plate_roi)
                 if plate_text:
-                    print(f"Placa detectada: {plate_text}")
+                    detected_plates.append(plate_text)
+                    
+                    if detected_plates.count(plate_text) >= 3:
+                        owner_info = check_plate(plate_text)
+                        if owner_info:
+                            print(f"Acceso permitido para {owner_info['name']}")
+                        else:
+                            print("Placa no reconocida, solicitando autorización.")
+                            register_visit(plate_text)
+                    
                     cv2.imshow("Detección de Placas", frame)
-                    #save_plate(plate_text)  # Guardar en la base de datos
 
-            # Actualizar el tiempo de la última imagen procesada
             last_processed_time = current_time
 
         cv2.imshow("Detección de Placas", frame)
-        if cv2.waitKey(1) & 0xFF == ord('q'):  # Presiona 'q' para salir
+        if cv2.waitKey(1) & 0xFF == ord('q'):
             break
 
     cap.release()
@@ -43,4 +51,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

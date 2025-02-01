@@ -1,14 +1,25 @@
 import sqlite3
 
-def fetch_records():
-    conn = sqlite3.connect('plates.db')
+def fetch_table_records(table_name):
+    conn = sqlite3.connect('residencial.db')
     cursor = conn.cursor()
-    cursor.execute('SELECT * FROM Plates')
-    records = cursor.fetchall()
+    
+    try:
+        cursor.execute(f'SELECT * FROM {table_name}')
+        records = cursor.fetchall()
+        
+        if records:
+            for record in records:
+                print(record)
+        else:
+            print(f"La tabla '{table_name}' está vacía.")
+    
+    except sqlite3.Error as e:
+        print(f"Error al obtener los datos: {e}")
+    
     conn.close()
-    return records
 
 if __name__ == "__main__":
-    records = fetch_records()
-    for record in records:
-        print(record)
+    print("Tablas disponibles: Inquilinos, Vehiculos, VisitasFrecuentes")
+    table_name = input("Ingrese el nombre de la tabla que desea ver: ")
+    fetch_table_records(table_name)
