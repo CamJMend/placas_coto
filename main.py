@@ -23,7 +23,7 @@ def main():
 
         current_time = time.time()
 
-        if current_time - last_processed_time >= 10:
+        if current_time - last_processed_time >= 2:
             plate_roi = detect_plates(frame, net)
             if plate_roi is not None:
                 plate_text = extract_text(plate_roi)
